@@ -1,12 +1,17 @@
 import sys
-
+import os
+from tabulate import tabulate
+import App.logic as log
+data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Data')
+default_name = os.path.join(data_dir, 'deliverytime_min.csv')
 
 def new_logic():
     """
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    catalog = log.new_logic()
+    return catalog
 
 def print_menu():
     print("Bienvenido")
@@ -26,7 +31,16 @@ def load_data(control):
     Carga los datos
     """
     #TODO: Realizar la carga de datos
-    pass
+    data = log.load_data(control, default_name)
+    verticies = log.diagraph(control)
+    edges = log.conexion_domicilios(control)
+    print("Un total de: "+ str(data[0]) + " registros han sido cargados")
+    print("Un total de: "+ str(data[1]) + " domiciliarios han sido encontrados")
+    print("Un total de: "+ str(data[2]) + " restaurantes han sido encontrados")
+    print("Un total de: "+ str(data[3]) + " domicilios han sido encontrados")
+    print("El tiempo promedio de entrega es: " + str(data[4]) + " minutos")
+    print("El grafo tiene un total de: " + str(verticies) + " vertices")
+    print("El grafo tiene un total de: " + str(edges) + " arcos")
 
 
 def print_data(control, id):
