@@ -147,12 +147,42 @@ def conexion_domicilios(catalog, graph):
     return graph["num_edges"]
                 
 
-def req_1(catalog):
+def req_1(catalog, id_a, id_b):
     """
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
-    pass
+    start_time = get_time()
+    conections = dfs.dfs(catalog["grafo"], id_a)
+    path = dfs.path_to(id_b, conections)
+    if path is None:
+        end_time = get_time()
+        time = delta_time(start_time, end_time)
+        return None, time
+    else:
+        restaurants = al.new_list()
+        node = path["first"]
+        ids = al.new_list()
+        while node is not None:
+            i = 0
+            centinela = False
+            while not centinela:
+                if catalog["registros"]["elements"][i]["ID"] == node["info"]:
+                    lat_1 = decimales(catalog["registros"]["elements"][i]["Restaurant_location_latitude"])
+                    long_1 = decimales(catalog["registros"]["elements"][i]["Restaurant_location_longitude"])
+                    key = (lat_1 + "_" + long_1)
+                    if mp.contains(conections["marked"], key):
+                        al.add_last(restaurants, key)
+                    if catalog["registros"]["elements"][i]["Delivery_person_ID"] not in ids:
+                        al.add_last(ids, catalog["registros"]["elements"][i]["Delivery_person_ID"])
+                        centinela = True    
+                i += 1
+            node = node["next"]
+        end_time = get_time()
+        time = delta_time(start_time, end_time)
+        return ids, path, restaurants, time
+        
+    
 
 
 def req_2(catalog):
