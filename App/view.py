@@ -86,7 +86,7 @@ def print_req_3(control):
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    id = input("Ingrese el ID qeu desea analizar: ")
+    id = input("Ingrese el ID que desea analizar: ")
     result = log.req_3(control, id)
     if result[0] is None:
         print("No se encontro el ID solicitado en el registro")
@@ -118,7 +118,18 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    id = input("Ingrese el ID que desea analizar: ")
+    result = log.req_6(control, id)
+    if result[0] is None:
+        print("No se encontro un camino para el ID solicitado en el registro")
+    else:
+        print("El camino de costo minimo cuneta con ")+str(result[1])+(" puntos intermedios")
+        print("El camino encontrado es:")
+        pp.pp(result[2])
+        print("el sub-camino que implico mayor costo es: ")
+        pp.pp(result[3])
+        print("El costo total del camino es: ")+str(result[4])
+        print("El tiempo de ejecucion fue de "+str(result[5])+" ms")
 
 
 def print_req_7(control):

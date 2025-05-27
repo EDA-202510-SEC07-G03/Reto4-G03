@@ -261,12 +261,52 @@ def req_5(catalog):
     # TODO: Modificar el requerimiento 5
     pass
 
-def req_6(catalog):
+def reconstruct_path(graph, visited, source, target):
+    """
+    Reconstruye el camino mínimo desde el vértice source al vértice target.
+    """
+    path = al.new_list()
+    current = target
+    al.add_last(path, source)
+    while current != source:
+        al.add_last(path, current)
+        neighbors = dg.adjacents(graph, current)
+        keys = mp.key_set(neighbors)
+        size_keys = al.size(neighbors)
+        centinela = False
+        i = 0
+        while not centinela and i < size_keys:
+            edge = dg.get_edge(graph, keys["elements"][i], current)
+            if mp.get(visited, keys["elements"][i]) + edge["weight"] == mp.get(visited, current):
+                current = keys["elements"][i]
+                centinela = True
+            i += 1
+        if not centinela:
+            return None
+    return path
+
+def req_6(catalog, id):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    pass
+    start_time = get_time()
+    dijkstra_result = dij.dijkstra(catalog["grafo"], id)
+    visited = dijkstra_result["visited"] 
+    reachable = {}
+    keys = mp.key_set(visited)
+    for key in keys:
+        if mp.get(visited, key) < float('inf'):
+            reachable[key] = mp.get(visited, key)
+    sorted_reachable = sorted(reachable.keys()) 
+    max_vertex = max(reachable, key=reachable.get)
+    max_cost = reachable[max_vertex]
+    path = reconstruct_path(catalog["grafo"], visited, id, max_vertex)
+    end_time = get_time()
+    time = delta_time(start_time, end_time)
+
+    return path, path["size"], sorted_reachable, path["elements"], max_cost, time
+
 
 
 def req_7(catalog):
