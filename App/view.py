@@ -1,6 +1,7 @@
 import sys
 import os
 from tabulate import tabulate
+import pprint as pp
 import App.logic as log
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Data')
 default_name = os.path.join(data_dir, 'deliverytime_min.csv')
@@ -55,6 +56,20 @@ def print_req_1(control):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
+    id_a = input("Ingrese el ID de la ubicacion de origen: ")
+    id_b = input("Ingrese el ID de la ubicacion de destino: ")
+    result = log.req_1(control, id_a, id_b)
+    if result[0] is None:
+        print("No hay un camino entre los puntos seleccionados")
+    else:
+        print("En el camino, se encontraron ")+str(result[1])+(" puntos intermedios")
+        print("Listado de ID's de los domiciliarios encontrados: ")
+        pp.pp(result[0])
+        print("El camino encontrado es:")
+        pp.pp(result[2])
+        print("En el camino se encontraron los sigyientes restaurantes: ")
+        pp.pp(result[3])
+        print("El tiempo de ejecucion fue de "+str(result[4])+" ms")       
     pass
 
 
@@ -71,7 +86,15 @@ def print_req_3(control):
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    id = input("Ingrese el ID qeu desea analizar: ")
+    result = log.req_3(control, id)
+    if result[0] is None:
+        print("No se encontro el ID solicitado en el registro")
+    else:
+        print("El ID del rappi que mas aparecio para el ID dado es: ")+str(result[0])
+        print("El rappi aparecio un total de: ")+str(result[1])+(" veces")
+        print("El vehiculo de preferencia del rappi es: ")+str(result[2])
+        print("El tiempo de ejecucion fue de "+str(result[3])+" ms")
 
 
 def print_req_4(control):

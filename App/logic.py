@@ -180,7 +180,7 @@ def req_1(catalog, id_a, id_b):
             node = node["next"]
         end_time = get_time()
         time = delta_time(start_time, end_time)
-        return ids, path, restaurants, time
+        return ids, path["size"], path["elements"], restaurants, time
         
     
 
@@ -193,12 +193,57 @@ def req_2(catalog):
     pass
 
 
-def req_3(catalog):
+def req_3(catalog, id):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
+    start_time = get_time()
+    centinela = False
+    j = 0
+    while not centinela and j < al.size(catalog["registros"]):
+        if catalog["registros"]["elements"][j]["ID"] == id:
+            lat = catalog["registros"]["elements"][j]["Restaurant_latitude"]
+            long = catalog["registros"]["elements"][j]["Restaurant_longitude"]
+            centinela = True
+        else:
+            j += 1
+    if not centinela:
+        end_time = get_time()
+        time = delta_time(start_time, end_time)
+        return None, time
+    apariciones = {}
+    vehiculos = {}
+    llave = decimales(lat) + "_" + decimales(long)
+    rappis = dg.get_vertex_information(catalog["grafo"], llave)["value"]
+    for i in range(al.size(catalog["registros"])):
+        if catalog["registros"]["elements"][i]["Restaurant_latitude"] == lat and catalog["registros"]["elements"][i]["Restaurant_longitude"] == long:
+            if catalog["registros"]["elements"][i]["Delivery_person_ID"] in rappis:
+                if catalog["registros"]["elements"][i]["Delivery_person_ID"] not in apariciones:
+                    apariciones[catalog["registros"]["elements"][i]["Delivery_person_ID"]] = 1
+                else:
+                    apariciones[catalog["registros"]["elements"][i]["Delivery_person_ID"]] += 1
+                if catalog["registros"]["elements"][i]["Delivery_person_ID"] not in vehiculos:
+                    vehiculos[catalog["registros"]["elements"][i]["Delivery_person_ID"]] = al.new_list()
+                    al.add_last(vehiculos[catalog["registros"]["elements"][i]["Delivery_person_ID"]], catalog["registros"]["elements"][i]["Type_of_vehicle"])
+                else:
+                    al.add_last(vehiculos[catalog["registros"]["elements"][i]["Delivery_person_ID"]], catalog["registros"]["elements"][i]["Type_of_vehicle"])
+    if apariciones:
+        rappi = max(apariciones, key=apariciones.get)
+        delivery_count = apariciones[rappi]
+        vehicles = vehiculos[rappi]
+        contador_2 = {}
+        for vehicle in vehicles:
+            if vehicle not in contador_2:
+                contador_2[vehicle] = 1
+            else:
+                contador_2[vehicle] += 1
+        vehicle = max(contador_2, key=contador_2.get)
+        preferencia_vehiculo = contador_2[vehicle]
+    end_time = get_time()
+    time = delta_time(start_time, end_time)
+    return rappi, delivery_count, preferencia_vehiculo, time             
+            
 
 
 def req_4(catalog):
