@@ -102,7 +102,19 @@ def print_req_4(control):
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    id_origen = input("Ingrese el ID del punto de origen: ")
+    id_destino = input("Ingrese el ID del punto de destino: ")
+    result = log.req_4(control, id_origen, id_destino)
+
+    if result[0] is None or len(result[0]) == 0:
+        print("No se encontraron domiciliarios en común entre las ubicaciones.")
+    else:
+        print("Los domiciliarios en común entre los dos puntos son:")
+        pp.pp(result[0])
+        print("La ruta entre las ubicaciones tiene " + str(result[1]) + " puntos intermedios.")
+        print("El camino más corto es:")
+        pp.pp(result[2])
+        print("El tiempo de ejecución fue de " + str(result[3]) + " ms.")
 
 
 def print_req_5(control):
@@ -137,7 +149,19 @@ def print_req_7(control):
         Función que imprime la solución del Requerimiento 7 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 7
-    pass
+    
+    punto_inicial = input("Ingrese el ID del punto geográfico inicial (ej. 4.6743_-74.0934): ")
+    id_domiciliario = input("Ingrese el ID del domiciliario: ")
+    result = log.req_7(control, punto_inicial, id_domiciliario)
+
+    if result is None or len(result["ubicaciones"]) == 0:
+        print("No se pudo construir una subred para el domiciliario dado desde el punto inicial.")
+    else:
+        print("Tiempo de ejecución: " + str(result["tiempo_ejecucion"]) + " ms")
+        print("Cantidad de ubicaciones en la subred: " + str(result["num_ubicaciones"]))
+        print("Identificadores de las ubicaciones ordenados alfabéticamente:")
+        pp.pp(result["ubicaciones"])
+        print("Costo total del Árbol de Recubrimiento Mínimo (en tiempo): " + str(result["costo_total"]))
 
 
 def print_req_8(control):
