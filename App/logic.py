@@ -246,12 +246,38 @@ def req_3(catalog, id):
             
 
 
-def req_4(catalog):
+def req_4(catalog, punto_A, punto_B):
     """
     Retorna el resultado del requerimiento 4
     """
-    # TODO: Modificar el requerimiento 4
-    pass
+    start_time = get_time()
+    
+    graph = catalog["grafo"]
+    
+    bfs_result = bfs.bfs(graph, punto_A)
+    
+    path = bfs.path_to(bfs_result, punto_B)
+    
+    if not path:
+        return 0.0, [], []
+    
+    secuencia_ubicaciones = al.new_list()
+    domiciliarios_por_punto = al.new_list()
+    
+    for punto in path:
+        al.add_last(secuencia_ubicaciones,(punto))
+        vertex_info = dg.get_vertex_information(graph, punto)
+        ids_en_punto = al.new_list()
+        al.add_last(ids_en_punto,vertex_info["value"]["elements"])
+        al.add_last(domiciliarios_por_punto,(ids_en_punto))
+
+    domiciliarios_comunes = al.new_list()
+    al.add_last(domiciliarios_comunes,domiciliarios_por_punto)
+    
+    end_time = get_time()
+    time = delta_time(start_time, end_time)
+    
+    return time, secuencia_ubicaciones, domiciliarios_comunes
 
 
 def req_5(catalog):
@@ -309,23 +335,67 @@ def req_6(catalog, id):
 
 
 
-def req_7(catalog):
+def req_7(catalog, punto_A, domiciliario_id):
     """
     Retorna el resultado del requerimiento 7
     """
     # TODO: Modificar el requerimiento 7
-    pass
+    start = get_time()
+    grafo_original = catalog["grafo"]
+    
+    subgrafo = dg.new_graph(1000)
+    vertices = grafo_original["vertices"]["table"]
+    
+    for entry in vertices:
+        if entry is not None:
+            id_nodo = entry["key"]
+            lista_domiciliarios = entry["value"]
+            if al.is_present(lista_domiciliarios, domiciliario_id):
+
+                dg.insert_vertex(subgrafo, id_nodo, lista_domiciliarios)
+    
+    for entry in vertices:
+        if entry is not None:
+            u = entry["key"]
+            if dg.contains_vertex(subgrafo, u):
+                adyacentes = dg.adjacents(grafo_original, u)
+                for i in range(1, al.size(adyacentes)+1):
+                    v = al.get_element(adyacentes, i)
+                    if dg.contains_vertex(subgrafo, v):
+                        arco = dg.get_edge(grafo_original, u, v)
+                        if not dg.contains_vertex(subgrafo, u, v):
+                            dg.add_edge(subgrafo, u, v, arco["weight"])
+    
+
+    mst_result = prim.prim(subgrafo, punto_A)
 
 
-def req_8(catalog):
-    """
-    Retorna el resultado del requerimiento 8
-    """
-    # TODO: Modificar el requerimiento 8
-    pass
+    total_peso = 0
+    ubicaciones = al.new_list()
+    
+    edges = mst_result["edges"]
+    for i in range(1, al.size(edges)+1):
+        edge = al.get_element(edges, i)
+        total_peso += edge["weight"]
+        if not al.is_present(ubicaciones, edge["vertexA"]):
+            al.add_last(ubicaciones, edge["vertexA"])
+        if not al.is_present(ubicaciones, edge["vertexB"]):
+            al.add_last(ubicaciones, edge["vertexB"])
 
+    ubicaciones_py = al.new_list()
+    for i in range(1, al.size(ubicaciones)+1):
+        al.add_last(ubicaciones_py,al.get_element(ubicaciones, i))
+    al.merge_sort(ubicaciones_py)
 
-# Funciones para medir tiempos de ejecucion
+    stop = get_time()
+    tiempo_total = delta_time(start,stop)
+
+    return {
+        "tiempo_ejecucion": tiempo_total,
+        "num_ubicaciones": al.size(ubicaciones_py),
+        "ubicaciones": ubicaciones_py,
+        "costo_total": round(total_peso, 2)
+    }
 
 def get_time():
     """
